@@ -1,0 +1,75 @@
+分页查询：
+
+		int pageSize =25;
+		int pageNum = 1;  
+		
+		if (Tools.isNotBlank(BeanCtx.g("rows",true)) && !BeanCtx.g("rows",true).equals("NaN")) {
+		    pageSize =Integer.parseInt(BeanCtx.g("rows",true));
+		    
+		}
+		if (Tools.isNotBlank(BeanCtx.g("page",true))) {
+		    pageNum = Integer.parseInt(BeanCtx.g("page",true));
+		    
+		}
+		
+		String totalNum=String.valueOf(Rdb.getCountBySql(sql)); 
+
+		sql += " limit " + (pageNum-1)*pageSize + ", "+ pageSize ;
+		
+		Document[] dc = Rdb.getAllDocumentsBySql(sql);
+		
+		String jsonStr = Documents.dc2json(dc,"");
+		
+		jsonStr = "{\"total\":"+totalNum+",\"rows\":"+jsonStr+"}";
+	    
+	    BeanCtx.p(jsonStr);
+		
+		return "";
+		
+定义json对象，返回对象：	 
+								JSONObject retObj = new JSONObject();
+								retObj.put("code", "-1");    			
+								BeanCtx.p(retObj.toString());
+		
+		
+		
+金额：	
+		import java.math.BigDecimal;
+
+		if(deduct_money.compareTo(BigDecimal.ZERO) == 1) {
+
+		BigDecimal balance = new BigDecimal(balanceStr);
+
+重载视图：
+				$("#dg").datagrid("reload"); // 重载视图
+                return false;
+	
+	
+返回与json转化：
+		                    String jsonStr = "{\"code\": \"-1\"}";
+                    BeanCtx.p(jsonStr);
+		
+		
+js获取日期控件的值：$("#start_time").datebox("getValue");	
+js获取用户选择控件的工号： $("#user").val();
+		
+		
+		
+
+备份代码：没有上线不要删除，用在押金充值页面底部：
+
+<div><p><input name="cborrow_number" id="cborrow_number" type="hidden"/></p><p><input name="category" id="category" type="hidden"/></p><p><input name="WF_OrUnid" id="WF_OrUnid" type="hidden"/></p><p><input name="place" id="place" type="hidden"/></p>
+</div>
+				
+
+/**
+*   根据ID查询用户名
+*/
+public String queryName(String userId){
+	String sql = "select CnName from bpm_orguserlist where Userid = '"+userId+"'";
+	String userName = Rdb.getValueBySql(sql);
+	return userName;
+}
+
+				
+				

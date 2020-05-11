@@ -1,0 +1,15 @@
+获取唯一数据库id：
+
+根据工号查询名字：queryName(WFAddName)
+
+查询一列数据：Document doc = Rdb.getDocumentBySql("select * from adbm_bookinfo where WF_OrUnid ='"+WFOrUnid+"'");
+
+获取查询回来的某个字段的值：doc.g("book_code")
+
+是否有记录： Rdb.hasRecord
+
+查询多行记录：Rdb.getDocumentBySql(sql);   
+
+获取其中的 一个字段的值：doc.g("book_code")
+
+获取某一列表的值为list形式：Rdb.getValueListBySql(sql)

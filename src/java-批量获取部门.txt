@@ -1,0 +1,111 @@
+package cn.linkey.rulelib.ADBM;
+
+import java.util.*;
+import cn.linkey.dao.*;
+import cn.linkey.util.*;
+import cn.linkey.doc.*;
+import cn.linkey.factory.*;
+import cn.linkey.rule.LinkeyRule;
+import cn.linkey.org.LinkeyUser;
+
+/**
+ * @RuleName:押金查询列表
+ * @author  15604
+ * @version: 8.0
+ * @Created: 2020-04-27 17:18:54
+ */
+final public class R_ADBM_D004  implements LinkeyRule {
+
+    public String tableName="App_TempCRUD"; //指定数据库表名，如果是多表的情况下只需指定主表的表名即可
+
+    @Override
+    public String run(HashMap<String, Object> params) throws Exception  {
+
+        int pageSize =25;
+        int pageNum = 1;
+        String searchStr = BeanCtx.g("searchStr", true);
+        String sql ="SELECT * FROM adbm_deposit WHERE  user_id_show LIKE '%"+ searchStr  +"%' AND balance > 0";
+        String totalNum=String.valueOf(Rdb.getCountBySql(sql)); //获取总数，分页时需要
+
+        if (Tools.isNotBlank(BeanCtx.g("rows",true)) && !BeanCtx.g("rows",true).equals("NaN")) {
+            pageSize =Integer.parseInt(BeanCtx.g("rows",true));
+        }
+        if (Tools.isNotBlank(BeanCtx.g("page",true))) {
+            pageNum = Integer.parseInt(BeanCtx.g("page",true));
+        }
+
+        sql += " limit " + (pageNum-1)*pageSize + ", "+ pageSize ;
+
+        Document[] docArray = Rdb.getAllDocumentsBySql(sql);
+        LinkeyUser userDao = new LinkeyUser();
+        for(Document doc : docArray) {
+            doc.s("ddd",userDao.getFullDeptNameByUserid(doc.g("user_id"),false));
+        }
+
+        //getFullDeptNameByUserid(String userid,boolean ctd)
+        String jsonStr = Documents.dc2json(docArray,"");
+        jsonStr = "{\"total\":"+totalNum+",\"rows\":"+jsonStr+"}";
+        BeanCtx.p(jsonStr);
+
+        return "";
+    }
+
+    //按要求输出视图所需的json数据源格式字符串
+    public void getData(){
+        //以下获取视图传入进来的分页参数
+        int pageSize =25; // Grid视图中传入进来的每页显示数
+        int pageNum = 1; // Grid视图中传入进来的当前页
+        if (Tools.isNotBlank(BeanCtx.g("rows",true)) && !BeanCtx.g("rows",true).equals("NaN")) {pageSize =Integer.parseInt(BeanCtx.g("rows",true));}
+        if (Tools.isNotBlank(BeanCtx.g("page",true))) {pageNum = Integer.parseInt(BeanCtx.g("page",true));}
+
+        //编写需要查询的SQL语句
+        String sql="select * from "+tableName+" where CustomerName like '%s%'";
+        String totalNum=String.valueOf(Rdb.getCountBySql(sql)); //获取总数，分页时需要
+
+        //执行sql语句并进行分页输出
+        Document[] dc=Rdb.getAllDocumentsBySql(sql,pageNum,pageSize);
+
+        //转为json字符串并按Grid视图的要求输出json格式
+        String jsonStr=Documents.dc2json(dc,"");
+        jsonStr="{\"total\":"+totalNum+",\"rows\":"+jsonStr+"}";
+        BeanCtx.p(jsonStr);
+    }
+
+    //当视图中点击文档删除按扭时回调本函数进行数据删除
+    public void onDelete(HashMap<String, Object> params){
+        int i=0;
+        String[] docUnids=(String[])params.get("DocUnids");
+        for (String docUnid : docUnids) {
+            Document doc = Rdb.getDocumentBySql("select * from " + tableName+ " where WF_OrUnid='" + docUnid + "'");
+            doc.remove(true); //删除到回收站中去
+            i++;
+        }
+        String msg = "{\"msg\":\""+ BeanCtx.getMsg("Common", "DeleteDocMsg", i) + "\"}";
+        BeanCtx.print(msg);
+    }
+
+    //当视图中点击拷贝按扭时回调本函数进行数据拷贝
+    public void onCopy(HashMap<String, Object> params){
+        int i=0;
+        String[] docUnids=(String[])params.get("DocUnids");
+        for (String docUnid : docUnids) {
+            Document doc = Rdb.getDocumentBySql("select * from " + tableName+ " where WF_OrUnid='" + docUnid + "'");
+            doc.copyTo(tableName);
+            i++;
+        }
+        String msg = "{\"msg\":\"" + BeanCtx.getMsg("Common", "CopyDocMsg", i)+ "\"}";
+        BeanCtx.print(msg);
+    }
+
+    //当视图中点击自定义按扭时回调本函数对数据进行操作
+    public void onBtnClick(HashMap<String, Object> params){
+        int i=0;
+        String[] docUnids=(String[])params.get("DocUnids");
+        String btnid=(String)params.get("WF_Btnid");//点击按扭的id
+        for (String docUnid : docUnids) {
+            Document doc = Rdb.getDocumentBySql("select * from " + tableName+ " where WF_OrUnid='" + docUnid + "'");
+        }
+        String msg = "{\"msg\":\"" + BeanCtx.getMsg("Common", "AppFormExeButton")+ "\"}";
+        BeanCtx.print(msg);
+    }
+}

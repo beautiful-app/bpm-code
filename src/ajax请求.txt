@@ -1,0 +1,29 @@
+    $.ajax({
+        url:'r?wf_num=R_ADBM_B013',  
+        type: "post",  
+        async : false,  
+        dataType:'json',  
+        data:{add_number:$("#add_number").val(),WF_OrUnid:$("#WF_OrUnid").val()},  
+        success:function(data){}
+    }); 
+	var url="r?wf_num=V_ADBM_E005";
+    location.href=url;
+	
+	
+	
+生成借阅记录的sql：
+	insert into adbm_borrow_returninfo (book_name,WF_OrUnid,WF_ParentDocUnid,WF_AddName,borrower,borrow_state,book_code,"
+        	           +"returner,place_id) values('"+doc.g("book_name")+"',REPLACE(UUID(),'-',''),'"+WFOrUnid+"','"+WFAddName+"',"
+        	           +"'"+queryName(WFAddName)+"','未发放','"+doc.g("book_code")+"','"+queryName(WFAddName)+"','"+doc.g("place_id")+"')
+					   
+					   
++ " VALUES( '"+ doc.g("book_name") +"','"+ doc.g("book_name") + "','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"','"+ doc.g("book_name") +"' )";
+
+
+
+
+
+
+
+
+
